@@ -5,7 +5,7 @@ int ledPin = 3;
 int tempPin = 1;
 int lightPin = 0;
 const int buttonPin = 2;
-
+int i = 0;
 int tval, lval;
 int buttonState = 0;
 int lastState = 0;
@@ -48,12 +48,18 @@ void loop()
     //Serial.print(brightness);
     Serial.print(lval);
     Serial.print("}");
-    Serial.println();   
+    Serial.println();
+
+    //show number in seveb=n segment
+    int k = i%10;
+    i++;
+    sevenSegmentPrint(k);
   } else {
+    
     Serial.println("{\"status\" = \"off\"}");
     analogWrite(ledPin,0);
+    sevenSegmentPrint(-1);
   }
-  sevenSegmentPrint(7);
   delay(1000);
 }
 
@@ -90,6 +96,6 @@ void sevenSegmentPrint(int num){
       shiftOut(data, clock, LSBFIRST, B00011000);
       break;
     default :
-      shiftOut(data, clock, LSBFIRST, B00000010);
+      shiftOut(data, clock, LSBFIRST, B11111110);
   }
 }

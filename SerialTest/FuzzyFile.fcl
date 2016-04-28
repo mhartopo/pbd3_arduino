@@ -1,0 +1,49 @@
+FUNCTION_BLOCK fillRatio
+
+// Define input variables
+VAR_INPUT				
+	temperature : REAL;
+	light : REAL;
+END_VAR
+
+// Define output variable
+VAR_OUTPUT				
+	environment_status : REAL;
+END_VAR
+
+
+FUZZIFY temperature			
+	TERM good := (18,0) (26,1) (30,1) (35,0);
+	TERM not_good := (-20, 1) (0, 1) (20,0) (32,0) (50,1) (60,1);
+END_FUZZIFY
+
+
+FUZZIFY light
+	TERM good := (250,0) (400,1) (600,1) (750,0);
+	TERM not_good := (0, 1) (300,0) (700,0) (1000,1);
+END_FUZZIFY
+
+DEFUZZIFY environment_status			
+	TERM bad := (0, 1) (2 , 0);
+	TERM enough := (2,0) (5,1) (8,0);
+	TERM good := (7,0) (9,1);
+	METHOD : COG;		// Use 'Center Of Gravity' defuzzification method
+	DEFAULT := 0;		// Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+// Inference rules
+RULEBLOCK No1
+	
+	AND : MIN;	// Use 'min' for 'and'
+	ACT : MIN;	// Use 'min' activation method
+	ACCU : MAX;	// Use 'max' accumulation method
+	
+	//rule definition
+	RULE 1 : IF temperature IS good  AND light IS good THEN environment_status IS good;
+	RULE 2 : IF temperature IS good  AND light IS not_good THEN environment_status IS enough;
+	RULE 3 : IF temperature IS not_good  AND light IS good THEN environment_status IS enough;
+	RULE 4 : IF temperature IS not_good  AND light IS not_good THEN environment_status IS bad;
+	
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
